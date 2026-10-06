@@ -7,36 +7,40 @@ AuthService::AuthService(QObject *parent)
 {
     connect(&m_client, &Client::responseReceived, this,
             [this](quint64 requestId, int statusCode, const QVariant & body) {
-                if (requestId != m_pendingRequestId)
-                    return;
+        if (requestId != m_pendingRequestId)
+            return;
 
-                m_pendingRequestId = 0;
-                setBusy(false);
+        m_pendingRequestId = 0;
+        setBusy(false);
 
-                if (statusCode >= 200 && statusCode < 300) {
-                    m_authenticated = true;
-                    m_userName = m_pendingUserName;
-                    emit userNameChanged();
-                    m_token = body.toMap().value("token").toString();
-                    qDebug() << m_token << "recieved";
-                    emit authenticatedChanged();
-                    return;
-                }
+        if (statusCode >= 200 && statusCode < 300) {
+            m_authenticated = true;
+            m_userName = m_pendingUserName;
+            emit userNameChanged();
+            m_token = body.toMap().value("token").toString();
+            qDebug() << m_token << "recieved";
+            emit authenticatedChanged();
+            return;
+        }
 
-                setErrorMessage(statusCode > 300
-                                    ? tr("The username or password is incorrect.")
-                                    : tr("Sign in failed. Please try again."));
-            });
+        if (statusCode > 300) {
+            setErrorMessage (tr("Sign in failed. Please try again."));
+            auth_count++;
+        }
+
+    });
 
     connect(&m_client, &Client::requestFailed, this,
             [this](quint64 requestId, const QString &) {
-                if (requestId != m_pendingRequestId)
-                    return;
+        if (requestId != m_pendingRequestId)
+            return;
 
-                m_pendingRequestId = 0;
-                setBusy(false);
-                setErrorMessage(tr("Unable to connect. Please try again."));
-            });
+        m_pendingRequestId = 0;
+        setBusy(false);
+        setErrorMessage(tr("Unable to connect. Please try again."));
+
+        auth_count++;
+    });
 }
 
 QUrl AuthService::baseUrl() const { return m_baseUrl; }
@@ -58,6 +62,11 @@ QString AuthService::errorMessage() const { return m_errorMessage; }
 
 void AuthService::login(const QString &userName, const QString &password)
 {
+    if (auth_count > 3) {
+        setErrorMessage("Too many authentication attempts");
+        return;
+    }
+
     if (m_busy)
         return;
 

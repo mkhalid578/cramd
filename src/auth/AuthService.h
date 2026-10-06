@@ -51,4 +51,5 @@ private:
     bool m_authenticated = false;
     QString m_userName;
     QString m_errorMessage;
+    int auth_count {0};
 };
