@@ -10,6 +10,7 @@ Item {
 
     property alias userName: userNameField.text
     property alias password: passwordField.text
+    property string errorMessage: ""
 
     signal loginRequested(string userName, string password)
 
@@ -68,6 +69,14 @@ Item {
                     if (loginButton.enabled)
                         root.loginRequested(root.userName, root.password)
                 }
+            }
+
+            Label {
+                text: root.errorMessage
+                color: "#ff8a80"
+                visible: root.errorMessage.length > 0
+                wrapMode: Text.Wrap
+                Layout.fillWidth: true
             }
 
             Button {

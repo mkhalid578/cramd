@@ -4,7 +4,7 @@ project(cramd VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Network Quick)
 
 qt_standard_project_setup(REQUIRES 6.10)
 
@@ -17,11 +17,19 @@ qt_add_executable(cramd-app
     main.cpp
 )
 
+include_directories(src/api)
+
 qt_add_qml_module(cramd-app
     URI cramd
     QML_FILES
         Main.qml
         qml/pages/LoginForm.qml
+        qml/pages/LoginSuccessPage.qml
+
+        SOURCES
+            src/api/client.cpp
+            src/api/client.h
+            SOURCES src/auth/AuthService.h src/auth/AuthService.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -36,7 +44,7 @@ set_target_properties(cramd-app PROPERTIES
 )
 
 target_link_libraries(cramd-app
-    PRIVATE Qt6::Quick
+    PRIVATE Qt6::Network Qt6::Quick
 )
 
 install(TARGETS cramd-app
