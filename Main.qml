@@ -10,59 +10,32 @@ ApplicationWindow {
     minimumWidth: 320
     minimumHeight: 360
     visible: true
-    title: qsTr("Sign in")
-    property int loginRequestId: 0
-    property string signedInUser: ""
+    title: auth.authenticated ? qsTr("Home") : qsTr("Sign in")
 
-    Client {
-        id: api
+    AuthService {
+        id: auth
         baseUrl: "http://localhost:3000"
-
-        onResponseReceived: (requestId, statusCode, body) => {
-                        if (requestId !== window.loginRequestId)
-                        return
-
-                        if (statusCode >= 200 && statusCode < 300) {
-                            window.signedInUser = loginForm.userName
-                            loginForm.password = ""
-                            pages.currentIndex = 1
-                            window.title = qsTr("Home")
-                        } else {
-                            loginForm.errorMessage = qsTr("Login Failed: %1").arg(body.error)
-                        }
-                    }
-
-        onRequestFailed: (requestId, message) => {
-                     if (requestId === window.loginRequestId)
-                     loginForm.errorMessage = message
-                 }
     }
 
     StackLayout {
         id: pages
         anchors.fill: parent
+        currentIndex: auth.authenticated ? 1 : 0
 
         Item {
             LoginForm {
                 id: loginForm
                 anchors.centerIn: parent
                 width: Math.min(parent.width - 32, 380)
-                onLoginRequested: (user, password) => {
-                              errorMessage = ""
-                              window.loginRequestId = api.post("auth/login", {
-                                                   email: user,
-                                                   password: password
-                                               })
-                          }
+                errorMessage: auth.errorMessage
+                onLoginRequested: (user, password) => auth.login(user, password)
             }
         }
 
         LoginSuccessPage {
-            userName: window.signedInUser
+            userName: auth.userName
             onSignOutRequested: {
-                window.signedInUser = ""
-                pages.currentIndex = 0
-                window.title = qsTr("Sign in")
+                auth.logout()
             }
         }
     }
