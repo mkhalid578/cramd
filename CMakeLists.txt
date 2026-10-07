@@ -19,6 +19,7 @@ qt_add_executable(cramd-app
 
 include_directories(src/api)
 include_directories(src/auth)
+include_directories(src/cars)
 
 qt_add_qml_module(cramd-app
         URI cramd
@@ -32,6 +33,11 @@ qt_add_qml_module(cramd-app
         src/api/client.h
         src/auth/AuthService.h
         src/auth/AuthService.cpp
+        src/cars/CarsService.h
+        src/cars/CarsService.cpp
+        src/cars/CarsListModel.h
+        src/cars/CarsListModel.cpp
+        QML_FILES qml/pages/MainPage.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

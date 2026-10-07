@@ -12,9 +12,19 @@ ApplicationWindow {
     visible: true
     title: auth.authenticated ? qsTr("Home") : qsTr("Sign in")
 
+    Client {
+        id: api
+        baseUrl: "http://localhost:3000"
+    }
+
     AuthService {
         id: auth
-        baseUrl: "http://localhost:3000"
+        client: api
+    }
+
+    CarsService {
+        id: cars
+        client: api
     }
 
     StackLayout {
@@ -30,6 +40,12 @@ ApplicationWindow {
                 errorMessage: auth.errorMessage
                 onLoginRequested: (user, password) => auth.login(user, password)
             }
+        }
+
+        MainPage {
+
+            service: cars
+
         }
 
         LoginSuccessPage {
