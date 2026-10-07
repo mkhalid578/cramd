@@ -5,10 +5,8 @@ import cramd
 
 ApplicationWindow {
     id: window
-    width: 640
-    height: 480
-    minimumWidth: 320
-    minimumHeight: 360
+    width: 402
+    height: 874
     visible: true
     title: auth.authenticated ? qsTr("Home") : qsTr("Sign in")
 
@@ -44,6 +42,8 @@ ApplicationWindow {
 
         MainPage {
 
+            username: auth.userName
+            onLogoutRequested: auth.logout()
             service: cars
 
         }

@@ -59,7 +59,6 @@ QVariantList CarsListModel::cars() const
 
 void CarsListModel::setCars(const QVariantList &cars)
 {
-    qDebug() << cars;
     beginResetModel();
     m_cars = cars;
     endResetModel();

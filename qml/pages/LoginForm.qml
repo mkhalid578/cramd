@@ -6,7 +6,7 @@ Item {
     id: root
 
     implicitWidth: 380
-    implicitHeight: 380
+    implicitHeight: formContent.implicitHeight + 56
 
     property alias userName: userNameField.text
     property alias password: passwordField.text
@@ -21,6 +21,7 @@ Item {
         border.color: "#3b3b3b"
 
         ColumnLayout {
+            id: formContent
             anchors.fill: parent
             anchors.margins: 28
             spacing: 16

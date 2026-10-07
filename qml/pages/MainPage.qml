@@ -6,6 +6,9 @@ import cramd
 Item {
     id: root
 
+    property string username: ""
+    signal logoutRequested()
+
     property CarsService service: ({})
 
     ColumnLayout {
@@ -13,15 +16,24 @@ Item {
         anchors.margins: 20
         spacing: 16
 
+        Label {
+            text: qsTr("Welcome %1").arg(username)
+        }
+
+
         RowLayout {
             Layout.fillWidth: true
-
             Label {
                 text: qsTr("Cars")
                 color: "#f4f4f4"
                 font.pixelSize: 24
                 font.bold: true
                 Layout.fillWidth: true
+            }
+
+            Button {
+                text: qsTr("Log Out")
+                onClicked: logoutRequested()
             }
 
             Button {
@@ -40,6 +52,8 @@ Item {
         }
 
         ListView {
+            id: carList
+
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumHeight: 0
@@ -49,47 +63,48 @@ Item {
             topMargin: 2
             bottomMargin: 2
             boundsBehavior: Flickable.StopAtBounds
-            ScrollBar.vertical: ScrollBar {
-                policy: ScrollBar.AsNeeded
+            orientation: Qt.Horizontal
+            snapMode: ListView.SnapOneItem
+
+            function updateCurrentIndexFromPosition() {
+                if (count === 0 || width <= 0)
+                    return
+
+                const pageSize = width + spacing
+                const index = Math.round((contentX - originX) / pageSize)
+                currentIndex = Math.max(0, Math.min(count - 1, index))
             }
 
-            delegate: Rectangle {
-                required property var car
+            onMovementEnded: updateCurrentIndexFromPosition()
 
-                width: ListView.view.width
-                height: 100
-                radius: 8
-                color: "white"
-                border.color: "#dddddd"
+            delegate: CarDelegate {}
+        }
 
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.margins: 16
-                    spacing: 12
+        RowLayout {
 
-                    ColumnLayout {
-                        Layout.fillWidth: true
-                        spacing: 4
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHCenter
 
-                        Label {
-                            text: `${car.model_year} ${car.make} ${car.model}`
-                            font.bold: true
-                            font.pixelSize: 18
-                        }
-
-                        Label {
-                            text: `${car.trim} · ${car.powertrain}`
-                            color: "#666666"
-                        }
-                    }
-
-                    Label {
-                        text: `${car.body_style}`
-                        font.bold: true
-                        font.pixelSize: 17
-                    }
+            Repeater {
+                model: carList.count
+                Rectangle {
+                    width: 8
+                    height: 8
+                    radius: width / 2
+                    color: "white"
+                    scale: index == carList.currentIndex ? 1.2 : 1.0
                 }
             }
+        }
+
+        Label {
+            property int activeIndex: carList.currentIndex
+            text: carList.count > 0
+              ? qsTr("%1 / %2").arg(activeIndex + 1).arg(carList.count)
+              : qsTr("0 / 0")
+            color: "#bdbdbd"
+            horizontalAlignment: Text.AlignHCenter
+            Layout.fillWidth: true
         }
     }
 }
