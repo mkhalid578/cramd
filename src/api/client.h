@@ -19,6 +19,7 @@ public:
 
     QUrl baseUrl() const;
     void setBaseUrl(const QUrl &baseUrl);
+    void setBearerToken(const QString &token);
 
     Q_INVOKABLE quint64 get(const QString &path);
     Q_INVOKABLE quint64 post(const QString &path, const QVariantMap &body);
@@ -35,5 +36,6 @@ private:
 
     QNetworkAccessManager m_networkAccessManager;
     QUrl m_baseUrl;
+    QString m_bearerToken;
     quint64 m_nextRequestId = 1;
 };

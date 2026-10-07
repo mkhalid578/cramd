@@ -5,7 +5,29 @@
 AuthService::AuthService(QObject *parent)
     : QObject(parent)
 {
-    connect(&m_client, &Client::responseReceived, this,
+}
+
+Client *AuthService::client() const
+{
+    return m_client;
+}
+
+void AuthService::setClient(Client *client)
+{
+    if (m_client == client)
+        return;
+
+    if (m_client)
+        disconnect(m_client.data(), nullptr, this, nullptr);
+    m_client = client;
+    m_pendingRequestId = 0;
+    setBusy(false);
+    emit clientChanged();
+
+    if (!m_client)
+        return;
+
+    connect(m_client.data(), &Client::responseReceived, this,
             [this](quint64 requestId, int statusCode, const QVariant & body) {
         if (requestId != m_pendingRequestId)
             return;
@@ -14,23 +36,29 @@ AuthService::AuthService(QObject *parent)
         setBusy(false);
 
         if (statusCode >= 200 && statusCode < 300) {
+            m_token = body.toMap().value("token").toString();
+            if (m_token.isEmpty()) {
+                setErrorMessage(tr("Sign in response did not include an access token."));
+                return;
+            }
+
+            if (m_client)
+                m_client->setBearerToken(m_token);
             m_authenticated = true;
             m_userName = m_pendingUserName;
             emit userNameChanged();
-            m_token = body.toMap().value("token").toString();
-            qDebug() << m_token << "recieved";
             emit authenticatedChanged();
             return;
         }
 
-        if (statusCode > 300) {
+        if (statusCode >= 300) {
             setErrorMessage (tr("Sign in failed. Please try again."));
             auth_count++;
         }
 
     });
 
-    connect(&m_client, &Client::requestFailed, this,
+    connect(m_client.data(), &Client::requestFailed, this,
             [this](quint64 requestId, const QString &) {
         if (requestId != m_pendingRequestId)
             return;
@@ -41,18 +69,6 @@ AuthService::AuthService(QObject *parent)
 
         auth_count++;
     });
-}
-
-QUrl AuthService::baseUrl() const { return m_baseUrl; }
-
-void AuthService::setBaseUrl(const QUrl &url)
-{
-    if (m_baseUrl == url)
-        return;
-
-    m_baseUrl = url;
-    m_client.setBaseUrl(url);
-    emit baseUrlChanged();
 }
 
 bool AuthService::busy() const { return m_busy; }
@@ -73,8 +89,15 @@ void AuthService::login(const QString &userName, const QString &password)
     setErrorMessage({});
     setBusy(true);
 
-    // Use the field names required by your backend's API contract.
-    m_pendingRequestId = m_client.post(
+    if (!m_client) {
+        m_pendingRequestId = 0;
+        setBusy(false);
+        setErrorMessage(tr("Authentication service is unavailable."));
+        return;
+    }
+
+    m_client->setBearerToken({});
+    m_pendingRequestId = m_client->post(
         "auth/login",
         {{"email", userName}, {"password", password}});
 
@@ -84,6 +107,9 @@ void AuthService::login(const QString &userName, const QString &password)
 void AuthService::logout()
 {
     m_authenticated = false;
+    m_token.clear();
+    if (m_client)
+        m_client->setBearerToken({});
     m_userName.clear();
     setErrorMessage({});
 
@@ -102,7 +128,6 @@ void AuthService::setBusy(bool busy)
 
 void AuthService::setErrorMessage(const QString &message)
 {
-    qDebug() << message;
     if (m_errorMessage == message)
         return;
 

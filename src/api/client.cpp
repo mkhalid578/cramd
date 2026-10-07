@@ -5,6 +5,7 @@
 #include <QNetworkReply>
 #include <QJsonArray>
 #include <QNetworkRequest>
+#include <QTimer>
 
 Client::Client(QObject *parent)
     : QObject(parent)
@@ -23,6 +24,11 @@ void Client::setBaseUrl(const QUrl &baseUrl)
 
     m_baseUrl = baseUrl;
     emit baseUrlChanged();
+}
+
+void Client::setBearerToken(const QString &token)
+{
+    m_bearerToken = token;
 }
 
 quint64 Client::get(const QString &path)
@@ -51,13 +57,19 @@ quint64 Client::sendRequest(const QString &path, const QByteArray &method,
     const QUrl url = urlForPath(path);
     if (!url.isValid() || url.host().isEmpty()
         || (url.scheme() != "http" && url.scheme() != "https")) {
-        emit requestFailed(requestId, tr("Set a valid HTTP or HTTPS base URL before making requests."));
+        QTimer::singleShot(0, this, [this, requestId] {
+            emit requestFailed(
+                requestId,
+                tr("Set a valid HTTP or HTTPS base URL before making requests."));
+        });
         return requestId;
     }
 
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     request.setRawHeader("Accept", "application/json");
+    if (!m_bearerToken.isEmpty())
+        request.setRawHeader("Authorization", "Bearer " + m_bearerToken.toUtf8());
     QNetworkReply *reply = m_networkAccessManager.sendCustomRequest(request, method, body);
 
     connect(reply, &QNetworkReply::finished, this, [this, reply, requestId] {
@@ -84,8 +96,6 @@ quint64 Client::sendRequest(const QString &path, const QByteArray &method,
             body = document.object().toVariantMap();
         else if (document.isArray())
             body = document.array().toVariantList();
-
-        qDebug() << body;
 
         emit responseReceived(requestId, statusCode, body);
     });

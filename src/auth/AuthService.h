@@ -3,6 +3,7 @@
 #include "client.h"
 
 #include <QObject>
+#include <QPointer>
 #include <QString>
 #include <QtQml/qqmlregistration.h>
 
@@ -11,7 +12,7 @@ class AuthService : public QObject
     Q_OBJECT
     QML_ELEMENT
 
-    Q_PROPERTY(QUrl baseUrl READ baseUrl WRITE setBaseUrl NOTIFY baseUrlChanged)
+    Q_PROPERTY(Client *client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(bool authenticated READ authenticated NOTIFY authenticatedChanged)
     Q_PROPERTY(QString userName READ userName NOTIFY userNameChanged)
@@ -20,8 +21,8 @@ class AuthService : public QObject
 public:
     explicit AuthService(QObject *parent = nullptr);
 
-    QUrl baseUrl() const;
-    void setBaseUrl(const QUrl &url);
+    Client *client() const;
+    void setClient(Client *client);
 
     bool busy() const;
     bool authenticated() const;
@@ -32,7 +33,7 @@ public:
     Q_INVOKABLE void logout();
 
 signals:
-    void baseUrlChanged();
+    void clientChanged();
     void busyChanged();
     void authenticatedChanged();
     void userNameChanged();
@@ -42,10 +43,9 @@ private:
     void setBusy(bool busy);
     void setErrorMessage(const QString &message);
 
-    Client m_client;
+    QPointer<Client> m_client;
     QString m_token;
     QString m_pendingUserName;
-    QUrl m_baseUrl;
     quint64 m_pendingRequestId = 0;
     bool m_busy = false;
     bool m_authenticated = false;
