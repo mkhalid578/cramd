@@ -4,12 +4,19 @@ import QtQuick.Controls.Basic
 
 Rectangle {
     required property var car
+    signal selected(var car)
 
     width: ListView.view.width
-    height: ListView.view.height
+    height: 160
+    anchors.margins: 16
     radius: 8
     color: "white"
     border.color: "#dddddd"
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: selected(car)
+    }
 
     RowLayout {
         anchors.fill: parent
@@ -18,11 +25,11 @@ Rectangle {
 
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 4
+            spacing: 12
 
-            Label {
-                text: `${car.trim}`
-                color: "black"
+            Image {
+                source: CarMake.urlForMake(`${car.make}`)
+                fillMode: Image.PreserveAspectFit
             }
 
             Label {
@@ -31,7 +38,7 @@ Rectangle {
             }
 
             Label {
-                text: `${car.make} ${car.model}`
+                text: `${car.model}`
                 font.bold: true
                 font.pixelSize: 18
                 color: "black"

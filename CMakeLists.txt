@@ -21,12 +21,15 @@ include_directories(src/api)
 include_directories(src/auth)
 include_directories(src/cars)
 
+set_source_files_properties(qml/CarMake.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
+
 qt_add_qml_module(cramd-app
         URI cramd
         QML_FILES
         Main.qml
         qml/pages/LoginForm.qml
         qml/pages/LoginSuccessPage.qml
+        qml/CarMake.qml
 
         SOURCES
         src/api/client.cpp
@@ -39,6 +42,9 @@ qt_add_qml_module(cramd-app
         src/cars/CarsListModel.cpp
         QML_FILES qml/pages/MainPage.qml
         QML_FILES qml/components/CarDelegate.qml
+        RESOURCES qml/assets/RearLegroom.svg
+        QML_FILES qml/components/InfoPopup.qml
+        QML_FILES qml/components/CarInfoPopup.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

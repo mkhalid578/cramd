@@ -11,6 +11,10 @@ Item {
 
     property CarsService service: ({})
 
+    CarInfoPopup {
+    id: popup
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
@@ -63,8 +67,7 @@ Item {
             topMargin: 2
             bottomMargin: 2
             boundsBehavior: Flickable.StopAtBounds
-            orientation: Qt.Horizontal
-            snapMode: ListView.SnapOneItem
+            // snapMode: ListView.SnapOneItem
 
             function updateCurrentIndexFromPosition() {
                 if (count === 0 || width <= 0)
@@ -77,7 +80,9 @@ Item {
 
             onMovementEnded: updateCurrentIndexFromPosition()
 
-            delegate: CarDelegate {}
+            delegate: CarDelegate {
+                onSelected: (selectedCar) => popup.openForCar(selectedCar)
+            }
         }
 
         RowLayout {
