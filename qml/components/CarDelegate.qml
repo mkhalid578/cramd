@@ -15,8 +15,8 @@ Rectangle {
         const list = ListView.view
         const itemTop = y - list.contentY
         return Math.min(1,
-                        Math.max(0, (itemTop + height) / edgeFadeHeight),
-                        Math.max(0, (list.height - itemTop) / edgeFadeHeight))
+                Math.max(0, (itemTop + height) / edgeFadeHeight),
+                Math.max(0, (list.height - itemTop) / edgeFadeHeight))
     }
     radius: 8
     color: "white"
@@ -58,13 +58,35 @@ Rectangle {
                 spacing: 12
 
                 Button {
-                    text: favorite ? "♥" : "+"
-                    icon.color: "black"
+                    id: favoriteButton
+                    Accessible.name: favorite ? qsTr("Remove from favorites")
+                                  : qsTr("Add to favorites")
                     Layout.preferredWidth: 48
+                    Layout.preferredHeight: 44
                     onClicked: favoriteToggled(car)
+
+                    contentItem: Text {
+                        text: favorite ? "♥" : "♡"
+                        color: favorite ? "#fff1f2" : "#e11d48"
+                        font.pixelSize: 23
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        scale: favoriteButton.down ? 0.88 : 1
+
+                        Behavior on scale {
+                            NumberAnimation { duration: 100 }
+                        }
+                    }
+
                     background: Rectangle {
-                        radius: 8
-                        border.color: "black"
+                        radius: 14
+                        color: favoriteButton.down ? "#be123c"
+                                       : favorite ? "#e11d48" : "#fff1f2"
+                        border.color: "#fecdd3"
+
+                        Behavior on color {
+                            ColorAnimation { duration: 140 }
+                        }
                     }
                 }
 
@@ -73,10 +95,19 @@ Rectangle {
                 }
 
                 Button {
-                    text: "More Info"
+                    id: detailsButton
+                    text: qsTr("More info ›")
+                    Layout.preferredHeight: 44
+                    Accessible.name: qsTr("More information about %1 %2")
+                    .arg(car.model_year).arg(car.make)
+                    onClicked: selected(car)
+
                     background: Rectangle {
-                        radius: 8
-                        border.color: "black"
+                        radius: 14
+                        gradient: Gradient {
+                            GradientStop { position: 0; color: detailsButton.down ? "#5b21b6" : "#7c3aed" }
+                            GradientStop { position: 1; color: detailsButton.down ? "#6d28d9" : "#4f46e5" }
+                        }
                     }
                 }
             }
