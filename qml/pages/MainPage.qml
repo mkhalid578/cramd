@@ -9,6 +9,29 @@ Item {
     property string username: ""
     signal logoutRequested()
     property CarsService service: ({})
+    property bool carsLoaded: false
+
+    function loadCarsIfNeeded() {
+        if (service && service.loadCars && !carsLoaded && !service.busy)
+            service.loadCars()
+    }
+
+    onVisibleChanged: {
+        if (visible)
+            loadCarsIfNeeded()
+    }
+
+    onServiceChanged: {
+        if (visible)
+            loadCarsIfNeeded()
+    }
+
+    Connections {
+        target: root.service
+        function onCarsChanged() {
+            root.carsLoaded = true
+        }
+    }
 
     CarInfoPopup {
         id: popup
@@ -44,22 +67,12 @@ Item {
                     Layout.fillWidth: true
                 }
 
-                RowLayout {
+                Label {
+                    text: qsTr("Cars")
+                    color: "#f4f4f4"
+                    font.pixelSize: 24
+                    font.bold: true
                     Layout.fillWidth: true
-
-                    Label {
-                        text: qsTr("Cars")
-                        color: "#f4f4f4"
-                        font.pixelSize: 24
-                        font.bold: true
-                        Layout.fillWidth: true
-                    }
-
-                    Button {
-                        text: root.service.busy ? qsTr("Loading…") : qsTr("Refresh")
-                        enabled: !root.service.busy
-                        onClicked: root.service.loadCars()
-                    }
                 }
 
                 Label {
@@ -70,33 +83,92 @@ Item {
                     Layout.fillWidth: true
                 }
 
-                ListView {
-                    id: carList
+                Item {
+                    id: carListContainer
 
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     Layout.minimumHeight: 0
-                    model: root.service.carsModel
-                    clip: true
-                    spacing: 10
-                    topMargin: 2
-                    bottomMargin: 2
-                    boundsBehavior: Flickable.StopAtBounds
-                    // snapMode: ListView.SnapOneItem
+                    property real pullDistance: 0
+                    readonly property real refreshThreshold: 72
 
-                    function updateCurrentIndexFromPosition() {
-                        if (count === 0 || width <= 0)
-                            return
+                    ListView {
+                        id: carList
+                        anchors.fill: parent
+                        model: root.service.carsModel
+                        clip: true
+                        spacing: 12
+                        topMargin: 4
+                        leftMargin: 8
+                        rightMargin: 8
+                        bottomMargin: 12
+                        boundsBehavior: Flickable.DragAndOvershootBounds
+                        ScrollBar.vertical: ScrollBar {
+                            policy: ScrollBar.AsNeeded
+                        }
 
-                        const pageSize = width + spacing
-                        const index = Math.round((contentX - originX) / pageSize)
-                        currentIndex = Math.max(0, Math.min(count - 1, index))
+                        onMovementStarted: carListContainer.pullDistance = 0
+                        onContentYChanged: {
+                            if (dragging && contentY < originY)
+                                carListContainer.pullDistance = Math.max(
+                                            carListContainer.pullDistance,
+                                            originY - contentY)
+                        }
+                        onMovementEnded: {
+                            if (carListContainer.pullDistance >= carListContainer.refreshThreshold
+                                    && !root.service.busy)
+                                root.service.loadCars()
+
+                            carListContainer.pullDistance = 0
+                            updateCurrentIndexFromPosition()
+                        }
+
+                        function updateCurrentIndexFromPosition() {
+                            if (count === 0 || width <= 0)
+                                return
+
+                            const pageSize = width + spacing
+                            const index = Math.round((contentX - originX) / pageSize)
+                            currentIndex = Math.max(0, Math.min(count - 1, index))
+                        }
+
+                        delegate: CarDelegate {
+                            onSelected: (selectedCar) => popup.openForCar(selectedCar)
+                        }
                     }
 
-                    onMovementEnded: updateCurrentIndexFromPosition()
+                    RowLayout {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        y: 8
+                        spacing: 8
+                        opacity: root.service.busy ? 1
+                                                    : Math.min(1, carListContainer.pullDistance
+                                                               / carListContainer.refreshThreshold)
+                        visible: opacity > 0 || root.service.busy
 
-                    delegate: CarDelegate {
-                        onSelected: (selectedCar) => popup.openForCar(selectedCar)
+                        Text {
+                            text: root.service.busy ? "↻" : "↓"
+                            color: "#6d28d9"
+                            font.pixelSize: 18
+
+                            RotationAnimation on rotation {
+                                from: 0
+                                to: 360
+                                duration: 900
+                                loops: Animation.Infinite
+                                running: root.service.busy
+                            }
+                        }
+
+                        Label {
+                            text: root.service.busy ? qsTr("Updating cars…")
+                                                    : carListContainer.pullDistance
+                                                      >= carListContainer.refreshThreshold
+                                                      ? qsTr("Release to refresh")
+                                                      : qsTr("Pull to refresh")
+                            color: "#6d28d9"
+                            font.pixelSize: 12
+                        }
                     }
                 }
             }
@@ -123,9 +195,41 @@ Item {
                 }
 
                 Button {
+                    id: logoutButton
                     text: qsTr("Log Out")
                     Layout.fillWidth: true
                     onClicked: root.logoutRequested()
+
+                    contentItem: RowLayout {
+                        spacing: 10
+                        anchors.centerIn: parent
+
+                        Text {
+                            text: "⇥"
+                            color: "#fca5a5"
+                            font.pixelSize: 20
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+
+                        Label {
+                            text: logoutButton.text
+                            color: "#fecaca"
+                            font.bold: true
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+                    }
+
+                    background: Rectangle {
+                        radius: 12
+                        color: logoutButton.down ? "#7f1d1d"
+                                     : logoutButton.hovered ? "#3f1d25" : "#2b1c22"
+                        border.color: "#7f343d"
+                        border.width: 1
+
+                        Behavior on color {
+                            ColorAnimation { duration: 130 }
+                        }
+                    }
                 }
             }
         }
@@ -133,16 +237,15 @@ Item {
         TabBar {
             id: tabBar
             Layout.fillWidth: true
-            implicitHeight: 76
+            Layout.margins: 8
             spacing: 6
-            padding: 8
 
-            background: Rectangle {
-                color: "#1f1f1f"
-                border.color: "#3b3b3b"
-                border.width: 1
-                radius: 18
-            }
+            // background: Rectangle {
+            //     color: "#1f1f1f"
+            //     border.color: "#3b3b3b"
+            //     border.width: 1
+            //     radius: 18
+            // }
 
 
             CustomTabButton {

@@ -46,6 +46,7 @@ qt_add_qml_module(cramd-app
         QML_FILES qml/components/InfoPopup.qml
         QML_FILES qml/components/CarInfoPopup.qml
         QML_FILES qml/components/CustomTabButton.qml
+        QML_FILES qml/components/RefreshButton.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

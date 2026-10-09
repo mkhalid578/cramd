@@ -5,12 +5,19 @@ import QtQuick.Controls.Basic
 Rectangle {
     required property var car
     property bool favorite: false
+    readonly property real edgeFadeHeight: 36
     signal selected(var car)
     signal favoriteToggled(var car)
 
-    width: ListView.view.width
+    width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
     height: 160
-    anchors.margins: 16
+    opacity: {
+        const list = ListView.view
+        const itemTop = y - list.contentY
+        return Math.min(1,
+                        Math.max(0, (itemTop + height) / edgeFadeHeight),
+                        Math.max(0, (list.height - itemTop) / edgeFadeHeight))
+    }
     radius: 8
     color: "white"
     border.color: "#dddddd"
