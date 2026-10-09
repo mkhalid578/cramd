@@ -4,7 +4,9 @@ import QtQuick.Controls.Basic
 
 Rectangle {
     required property var car
+    property bool favorite: false
     signal selected(var car)
+    signal favoriteToggled(var car)
 
     width: ListView.view.width
     height: 160
@@ -49,9 +51,10 @@ Rectangle {
                 spacing: 12
 
                 Button {
-                    text: "+"
+                    text: favorite ? "♥" : "+"
                     icon.color: "black"
                     Layout.preferredWidth: 48
+                    onClicked: favoriteToggled(car)
                     background: Rectangle {
                         radius: 8
                         border.color: "black"
