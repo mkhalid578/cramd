@@ -5,9 +5,13 @@ import QtQuick.Controls.Basic
 Rectangle {
     required property var car
     property bool favorite: false
+    property int suitcaseCount: 0
+    property int strollerCount: 0
     readonly property real edgeFadeHeight: 36
     signal selected(var car)
     signal favoriteToggled(var car)
+    signal suitcaseAdded(var car)
+    signal strollerAdded(var car)
 
     width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
     height: 160
@@ -55,7 +59,7 @@ Rectangle {
 
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 12
+                spacing: 8
 
                 Button {
                     id: favoriteButton
@@ -90,13 +94,92 @@ Rectangle {
                     }
                 }
 
+                Button {
+                    id: suitcaseButton
+                    Accessible.name: qsTr("Add suitcase to %1 %2. %3 packed")
+                                     .arg(car.model_year).arg(car.make).arg(suitcaseCount)
+                    Layout.preferredWidth: 72
+                    Layout.preferredHeight: 44
+                    onClicked: {
+
+                        suitcaseAdded(car)
+                    }
+
+                    contentItem: RowLayout {
+                        spacing: 5
+
+                        Text {
+                            text: "🧳"
+                            font.pixelSize: 17
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+
+                        Label {
+                            text: `${suitcaseCount} +`
+                            color: "#075985"
+                            font.bold: true
+                            font.pixelSize: 13
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+                    }
+
+                    background: Rectangle {
+                        radius: 14
+                        color: suitcaseButton.down ? "#bae6fd" : "#e0f2fe"
+                        border.color: "#7dd3fc"
+
+                        Behavior on color {
+                            ColorAnimation { duration: 130 }
+                        }
+                    }
+                }
+
+                Button {
+                    id: strollerButton
+                    Accessible.name: qsTr("Add stroller to %1 %2. %3 packed")
+                                     .arg(car.model_year).arg(car.make).arg(strollerCount)
+                    Layout.preferredWidth: 72
+                    Layout.preferredHeight: 44
+                    onClicked: strollerAdded(car)
+
+                    contentItem: RowLayout {
+                        spacing: 4
+
+                        Image {
+                            source: "qrc:/qt/qml/cramd/qml/assets/Stroller.svg"
+                            sourceSize: Qt.size(22, 22)
+                            Layout.preferredWidth: 22
+                            Layout.preferredHeight: 22
+                        }
+
+                        Label {
+                            text: `${strollerCount} +`
+                            color: "#6d28d9"
+                            font.bold: true
+                            font.pixelSize: 13
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+                    }
+
+                    background: Rectangle {
+                        radius: 14
+                        color: strollerButton.down ? "#ddd6fe" : "#ede9fe"
+                        border.color: "#c4b5fd"
+
+                        Behavior on color {
+                            ColorAnimation { duration: 130 }
+                        }
+                    }
+                }
+
                 Item {
                     Layout.fillWidth: true
                 }
 
                 Button {
                     id: detailsButton
-                    text: qsTr("More info ›")
+                    text: qsTr("Info ›")
+                    Layout.preferredWidth: 92
                     Layout.preferredHeight: 44
                     Accessible.name: qsTr("More information about %1 %2")
                     .arg(car.model_year).arg(car.make)

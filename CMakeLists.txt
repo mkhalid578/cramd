@@ -42,11 +42,13 @@ qt_add_qml_module(cramd-app
         src/cars/CarsListModel.cpp
         QML_FILES qml/pages/MainPage.qml
         QML_FILES qml/components/CarDelegate.qml
-        RESOURCES qml/assets/RearLegroom.svg qml/assets/CramdLogo.svg
+        RESOURCES qml/assets/RearLegroom.svg qml/assets/CramdLogo.svg qml/assets/Stroller.svg
         QML_FILES qml/components/InfoPopup.qml
         QML_FILES qml/components/CarInfoPopup.qml
         QML_FILES qml/components/CustomTabButton.qml
         QML_FILES qml/components/RefreshButton.qml
+        QML_FILES qml/components/CargoItemCounter.qml
+        QML_FILES qml/components/CargoItemsComboBox.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

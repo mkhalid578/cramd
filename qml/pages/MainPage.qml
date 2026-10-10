@@ -10,6 +10,50 @@ Item {
     signal logoutRequested()
     property CarsService service: ({})
     property bool carsLoaded: false
+    property var packedItemsByCar: ({})
+
+    function carKey(car) {
+        if (car.id !== undefined && car.id !== null)
+            return String(car.id)
+
+        return [car.make, car.model, car.model_year, car.trim].join("|")
+    }
+
+    function suitcaseCountFor(car) {
+        return packedItemCountFor(car, "suitcase")
+    }
+
+    function strollerCountFor(car) {
+        return packedItemCountFor(car, "stroller")
+    }
+
+    function packedItemsFor(car) {
+        return car ? packedItemsByCar[carKey(car)] || [] : []
+    }
+
+    function packedItemCountFor(car, type) {
+        return packedItemsFor(car).filter(item => item === type).length
+    }
+
+    function updatePackedItems(car, type, change) {
+        if (!car)
+            return
+
+        const itemsByCar = Object.assign({}, packedItemsByCar)
+        const key = carKey(car)
+        const items = packedItemsFor(car).slice()
+
+        if (change > 0) {
+            items.push(type)
+        } else {
+            const index = items.lastIndexOf(type)
+            if (index >= 0)
+                items.splice(index, 1)
+        }
+
+        itemsByCar[key] = items
+        packedItemsByCar = itemsByCar
+    }
 
     function loadCarsIfNeeded() {
         if (service && service.loadCars && !carsLoaded && !service.busy)
@@ -35,6 +79,15 @@ Item {
 
     CarInfoPopup {
         id: popup
+        packedItems: root.packedItemsFor(car)
+        suitcaseCount: root.suitcaseCountFor(car)
+        onSuitcaseCountChangeRequested: change => {
+            root.updatePackedItems(car, "suitcase", change)
+        }
+        strollerCount: root.strollerCountFor(car)
+        onStrollerCountChangeRequested: change => {
+            root.updatePackedItems(car, "stroller", change)
+        }
     }
 
     ColumnLayout {
@@ -133,7 +186,17 @@ Item {
                         }
 
                         delegate: CarDelegate {
+                            suitcaseCount: root.suitcaseCountFor(car)
+                            strollerCount: root.strollerCountFor(car)
                             onSelected: (selectedCar) => popup.openForCar(selectedCar)
+                            onSuitcaseAdded: (selectedCar) => {
+                                root.updatePackedItems(selectedCar, "suitcase", 1)
+                                popup.openForCar(selectedCar)
+                            }
+                            onStrollerAdded: (selectedCar) => {
+                                root.updatePackedItems(selectedCar, "stroller", 1)
+                                popup.openForCar(selectedCar)
+                            }
                         }
                     }
 
@@ -257,7 +320,7 @@ Item {
             CustomTabButton {
                 id: profileTab
                 text: qsTr("Profile")
-                buttonIcon: "●"
+                buttonIcon: "⚙"
             }
         }
     }
