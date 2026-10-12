@@ -32,6 +32,8 @@ void AuthService::setClient(Client *client)
         if (requestId != m_pendingRequestId)
             return;
 
+        qDebug() << body;
+
         m_pendingRequestId = 0;
         setBusy(false);
 
@@ -47,6 +49,8 @@ void AuthService::setClient(Client *client)
             m_authenticated = true;
             m_userName = m_pendingUserName;
             emit userNameChanged();
+            m_firstName = body.toMap().value("first_name").toString();
+            emit firstNameChanged();
             emit authenticatedChanged();
             return;
         }
@@ -133,4 +137,8 @@ void AuthService::setErrorMessage(const QString &message)
 
     m_errorMessage = message;
     emit errorMessageChanged();
+}
+QString AuthService::firstName() const
+{
+    return m_firstName;
 }
