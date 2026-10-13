@@ -16,6 +16,7 @@ class AuthService : public QObject
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(bool authenticated READ authenticated NOTIFY authenticatedChanged)
     Q_PROPERTY(QString userName READ userName NOTIFY userNameChanged)
+    Q_PROPERTY(QString firstName READ firstName NOTIFY firstNameChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
 
 public:
@@ -32,12 +33,16 @@ public:
     Q_INVOKABLE void login(const QString &userName, const QString &password);
     Q_INVOKABLE void logout();
 
+    QString firstName() const;
+
 signals:
     void clientChanged();
     void busyChanged();
     void authenticatedChanged();
     void userNameChanged();
     void errorMessageChanged();
+
+    void firstNameChanged();
 
 private:
     void setBusy(bool busy);
@@ -52,4 +57,5 @@ private:
     QString m_userName;
     QString m_errorMessage;
     int auth_count {0};
+    QString m_firstName;
 };

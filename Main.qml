@@ -43,6 +43,8 @@ ApplicationWindow {
         MainPage {
 
             username: auth.userName
+            firstName: auth.firstName
+
             onLogoutRequested: auth.logout()
             service: cars
 

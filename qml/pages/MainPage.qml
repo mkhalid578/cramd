@@ -7,6 +7,7 @@ Item {
     id: root
 
     property string username: ""
+    property string firstName: ""
     signal logoutRequested()
     property CarsService service: ({})
     property bool carsLoaded: false
@@ -115,7 +116,7 @@ Item {
                 spacing: 16
 
                 Label {
-                    text: qsTr("Welcome %1").arg(root.username)
+                    text: qsTr("Welcome %1").arg(root.firstName)
                     color: "#f4f4f4"
                     Layout.fillWidth: true
                 }
