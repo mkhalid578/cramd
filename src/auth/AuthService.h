@@ -18,6 +18,7 @@ class AuthService : public QObject
     Q_PROPERTY(QString userName READ userName NOTIFY userNameChanged)
     Q_PROPERTY(QString firstName READ firstName NOTIFY firstNameChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
+    Q_PROPERTY(QString successMsg READ successMsg NOTIFY successMsgChanged )
 
 public:
     explicit AuthService(QObject *parent = nullptr);
@@ -32,8 +33,11 @@ public:
 
     Q_INVOKABLE void login(const QString &userName, const QString &password);
     Q_INVOKABLE void logout();
+    Q_INVOKABLE void registerUser(const QString& first, const QString& last, const QString& email, const QString& password);
 
     QString firstName() const;
+
+    QString successMsg() const;
 
 signals:
     void clientChanged();
@@ -44,9 +48,12 @@ signals:
 
     void firstNameChanged();
 
+    void successMsgChanged();
+
 private:
     void setBusy(bool busy);
     void setErrorMessage(const QString &message);
+    void setSuccessMessage(const QString &message);
 
     QPointer<Client> m_client;
     QString m_token;
@@ -58,4 +65,5 @@ private:
     QString m_errorMessage;
     int auth_count {0};
     QString m_firstName;
+    QString m_successMsg;
 };

@@ -11,8 +11,10 @@ Item {
     property alias userName: userNameField.text
     property alias password: passwordField.text
     property string errorMessage: ""
+    property string successMsg: ""
 
     signal loginRequested(string userName, string password)
+    signal registerUserSelected();
 
     Rectangle {
         anchors.fill: parent
@@ -38,6 +40,16 @@ Item {
                 text: qsTr("Sign in to continue")
                 color: "#bdbdbd"
                 Layout.fillWidth: true
+            }
+
+            Label {
+                text: qsTr("Sign up?")
+                color: "#bdbdbd"
+                Layout.fillWidth: true
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: registerUserSelected()
+                }
             }
 
             Label {
