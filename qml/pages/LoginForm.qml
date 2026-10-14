@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
-import cramd.components 1.0
+import cramd.components
 
 Item {
     id: root
@@ -49,7 +49,7 @@ Item {
                 Layout.fillWidth: true
             }
 
-            TextField {
+            CustomTextField {
                 id: userNameField
                 objectName: "userNameField"
                 placeholderText: qsTr("User name")
@@ -63,7 +63,7 @@ Item {
                 Layout.fillWidth: true
             }
 
-            TextField {
+            CustomTextField {
                 id: passwordField
                 objectName: "passwordField"
                 placeholderText: qsTr("Password")
@@ -87,7 +87,7 @@ Item {
                 Layout.fillWidth: true
                 spacing: 12
 
-                SignInButton {
+                CustomButton {
                     id: loginButton
                     text: qsTr("Sign in")
                     enabled: root.userName.trim().length > 0 && root.password.length > 0

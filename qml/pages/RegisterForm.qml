@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
+import cramd.components
 
 Item {
     id: root
@@ -65,10 +66,10 @@ Item {
                 Layout.fillWidth: true
             }
 
-            TextField {
+            CustomTextField {
                 id: userNameField
                 objectName: "userNameField"
-                placeholderText: qsTr("email")
+                placeholderText: qsTr("Email")
                 Layout.fillWidth: true
                 onAccepted: passwordField.forceActiveFocus()
             }
@@ -79,7 +80,7 @@ Item {
                 Layout.fillWidth: true
             }
 
-            TextField {
+            CustomTextField {
                 id: firstNameField
                 placeholderText: qsTr("First Name")
                 Layout.fillWidth: true
@@ -91,7 +92,7 @@ Item {
                 Layout.fillWidth: true
             }
 
-            TextField {
+            CustomTextField {
                 id: lastNameField
                 placeholderText: qsTr("Last Name")
                 Layout.fillWidth: true
@@ -104,7 +105,7 @@ Item {
                 Layout.fillWidth: true
             }
 
-            TextField {
+            CustomTextField {
                 id: passwordField
                 objectName: "passwordField"
                 placeholderText: qsTr("Password")
@@ -132,11 +133,12 @@ Item {
                 Layout.fillWidth: true
             }
 
-            Button {
+            CustomButton {
                 id: loginButton
                 text: qsTr("Register")
                 enabled: root.userName.trim().length > 0 && root.password.length > 0
                 Layout.fillWidth: true
+                Layout.preferredHeight: 48
                 onClicked: root.registerRequested(root.userName, root.firstName, root.lastName, root.password)
             }
         }

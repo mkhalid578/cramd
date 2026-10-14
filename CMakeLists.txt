@@ -53,6 +53,7 @@ qt_add_library(cramd-components STATIC)
 qt_add_qml_module(cramd-components
         URI cramd.components
         VERSION 1.0
+        OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cramd/components"
         QML_FILES
         qml/components/InfoPopup.qml
         qml/components/CarInfoPopup.qml
@@ -62,6 +63,9 @@ qt_add_qml_module(cramd-components
         qml/components/CargoItemsComboBox.qml
         qml/components/SignInButton.qml
         qml/components/SignUpButton.qml
+        qml/components/CustomTextField.qml
+        QML_FILES qml/components/CustomButton.qml
+        QML_FILES qml/components/LogoutButton.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
