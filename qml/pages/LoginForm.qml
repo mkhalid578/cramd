@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
+import cramd
 
 Item {
     id: root
@@ -43,16 +44,6 @@ Item {
             }
 
             Label {
-                text: qsTr("Sign up?")
-                color: "#bdbdbd"
-                Layout.fillWidth: true
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: registerUserSelected()
-                }
-            }
-
-            Label {
                 text: qsTr("User name")
                 color: "#f4f4f4"
                 Layout.fillWidth: true
@@ -92,12 +83,29 @@ Item {
                 Layout.fillWidth: true
             }
 
-            Button {
-                id: loginButton
-                text: qsTr("Sign in")
-                enabled: root.userName.trim().length > 0 && root.password.length > 0
+            RowLayout {
                 Layout.fillWidth: true
-                onClicked: root.loginRequested(root.userName, root.password)
+                spacing: 12
+
+                SignInButton {
+                    id: loginButton
+                    text: qsTr("Sign in")
+                    enabled: root.userName.trim().length > 0 && root.password.length > 0
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    onClicked: root.loginRequested(root.userName, root.password)
+
+                }
+
+
+                SignUpButton {
+                    id: signUpButton
+                    text: qsTr("Create account")
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    onClicked: registerUserSelected()
+
+                }
             }
         }
     }

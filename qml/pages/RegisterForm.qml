@@ -16,6 +16,7 @@ Item {
     property string successMsg: ""
 
     signal registerRequested(string email, string first, string last, string password)
+    signal backToLoginRequested()
 
     Rectangle {
         anchors.fill: parent
@@ -28,6 +29,28 @@ Item {
             anchors.fill: parent
             anchors.margins: 28
             spacing: 16
+
+            Button {
+                text: qsTr("←  Back to sign in")
+                Layout.alignment: Qt.AlignLeft
+                Layout.preferredWidth: 164
+                Layout.preferredHeight: 40
+                onClicked: root.backToLoginRequested()
+
+                contentItem: Text {
+                    text: parent.text
+                    color: "#d6d6d6"
+                    font.pixelSize: 14
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                background: Rectangle {
+                    radius: 8
+                    color: parent.down ? "#202020" : parent.hovered ? "#383838" : "#303030"
+                    border.color: "#454545"
+                }
+            }
 
 
             Label {
@@ -87,10 +110,10 @@ Item {
                 placeholderText: qsTr("Password")
                 echoMode: TextInput.Password
                 Layout.fillWidth: true
-                onAccepted: {
-                    if (loginButton.enabled)
-                        root.loginRequested(root.userName, root.password)
-                }
+                // onAccepted: {
+                //     if (loginButton.enabled)
+                //         root.loginRequested(root.userName, root.password)
+                // }
             }
 
             Label {

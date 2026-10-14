@@ -30,6 +30,17 @@ qt_add_qml_module(cramd-app
         qml/pages/LoginForm.qml
         qml/pages/LoginSuccessPage.qml
         qml/CarMake.qml
+        qml/components/InfoPopup.qml
+        qml/components/CarInfoPopup.qml
+        qml/components/CustomTabButton.qml
+        qml/components/RefreshButton.qml
+        qml/components/CargoItemCounter.qml
+        qml/components/CargoItemsComboBox.qml
+        qml/pages/RegisterForm.qml
+        qml/components/SignInButton.qml
+        qml/components/SignUpButton.qml
+        qml/pages/MainPage.qml
+        qml/components/CarDelegate.qml
 
         SOURCES
         src/api/client.cpp
@@ -40,16 +51,9 @@ qt_add_qml_module(cramd-app
         src/cars/CarsService.cpp
         src/cars/CarsListModel.h
         src/cars/CarsListModel.cpp
-        QML_FILES qml/pages/MainPage.qml
-        QML_FILES qml/components/CarDelegate.qml
+
         RESOURCES qml/assets/RearLegroom.svg qml/assets/CramdLogo.svg qml/assets/Stroller.svg
-        QML_FILES qml/components/InfoPopup.qml
-        QML_FILES qml/components/CarInfoPopup.qml
-        QML_FILES qml/components/CustomTabButton.qml
-        QML_FILES qml/components/RefreshButton.qml
-        QML_FILES qml/components/CargoItemCounter.qml
-        QML_FILES qml/components/CargoItemsComboBox.qml
-        QML_FILES qml/pages/RegisterForm.qml
+
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
