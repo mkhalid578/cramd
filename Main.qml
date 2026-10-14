@@ -5,8 +5,8 @@ import cramd
 
 ApplicationWindow {
     id: window
-    width: 402
-    height: 874
+    width: Qt.platform.os === "ios" ? Screen.width : 402
+    height: Qt.platform.os === "ios" ? Screen.height : 874
     visible: true
     title: auth.authenticated ? qsTr("Home") : qsTr("Sign in")
 
@@ -42,33 +42,33 @@ ApplicationWindow {
 
     Component {
         id: loginForm
-        Item {
+
+
             LoginForm {
-                anchors.centerIn: parent
+                id: loginCard
                 errorMessage: auth.errorMessage
                 successMsg: auth.successMsg
-                width: Math.min(parent.width - 32, 380)
 
                 onLoginRequested: (user, password) => auth.login(user, password)
 
-                onRegisterUserSelected: registerOverlay.push(registerForm)
+                onRegisterUserSelected: pages.push(registerForm)
             }
-        }
     }
 
     Component {
         id: registerForm
 
-        Item {
+
+
             RegisterForm {
-                anchors.centerIn: parent
-                width: Math.min(parent.width - 32, 380)
+                id: registerCard
+
                 errorMessage: auth.errorMessage
                 successMsg: auth.successMsg
                 onRegisterRequested: (user, first, last, password) => auth.registerUser(first, last, user, password)
-                onBackToLoginRequested: registerOverlay.pop()
+                onBackToLoginRequested: pages.pop()
             }
-        }
+
     }
 
     Component {
@@ -91,33 +91,7 @@ ApplicationWindow {
     StackView{
         id: pages
         anchors.fill: parent
+        anchors.margins: 8
         initialItem: loginForm
-    }
-
-    StackView {
-        id: registerOverlay
-        anchors.fill: parent
-        z: 1
-        initialItem: Item {}
-
-        pushEnter: Transition {
-            NumberAnimation {
-                property: "y"
-                from: registerOverlay.height
-                to: 0
-                duration: 350
-                easing.type: Easing.OutCubic
-            }
-        }
-
-        popExit: Transition {
-            NumberAnimation {
-                property: "y"
-                from: 0
-                to: registerOverlay.height + 10
-                duration: 280
-                easing.type: Easing.OutCubic
-            }
-        }
     }
 }

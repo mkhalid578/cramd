@@ -3,11 +3,11 @@ import QtQuick.Controls.Basic
 import QtQuick.Layouts
 import cramd.components
 
-Item {
+Rectangle {
     id: root
 
     implicitWidth: 380
-    implicitHeight: formContent.implicitHeight + 56
+    implicitHeight: formContent.implicitHeight + 32
 
     property alias userName: userNameField.text
     property alias password: passwordField.text
@@ -16,97 +16,78 @@ Item {
 
     signal loginRequested(string userName, string password)
     signal registerUserSelected();
+    signal inputFocusRequested(var input)
 
-    Rectangle {
-        anchors.fill: parent
-        radius: 12
-        color: "#262626"
-        border.color: "#3b3b3b"
+    color: "#F0EAD6"
 
-        ColumnLayout {
-            id: formContent
-            anchors.fill: parent
-            anchors.margins: 28
-            spacing: 16
+    ColumnLayout {
+        id: formContent
+        anchors.centerIn: parent
+        width: Math.min(parent.width - 32, 380)
+        height: implicitHeight
+        spacing: 32
 
-            Label {
-                text: qsTr("Welcome back")
-                color: "#f4f4f4"
-                font.pixelSize: 24
-                font.bold: true
-                Layout.fillWidth: true
-            }
-
-            Label {
-                text: qsTr("Sign in to continue")
-                color: "#bdbdbd"
-                Layout.fillWidth: true
-            }
-
-            Label {
-                text: qsTr("User name")
-                color: "#f4f4f4"
-                Layout.fillWidth: true
-            }
-
-            CustomTextField {
-                id: userNameField
-                objectName: "userNameField"
-                placeholderText: qsTr("User name")
-                Layout.fillWidth: true
-                onAccepted: passwordField.forceActiveFocus()
-            }
-
-            Label {
-                text: qsTr("Password")
-                color: "#f4f4f4"
-                Layout.fillWidth: true
-            }
-
-            CustomTextField {
-                id: passwordField
-                objectName: "passwordField"
-                placeholderText: qsTr("Password")
-                echoMode: TextInput.Password
-                Layout.fillWidth: true
-                onAccepted: {
-                    if (loginButton.enabled)
-                        root.loginRequested(root.userName, root.password)
-                }
-            }
-
-            Label {
-                text: root.errorMessage
-                color: "#ff8a80"
-                visible: root.errorMessage.length > 0
-                wrapMode: Text.Wrap
-                Layout.fillWidth: true
-            }
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 12
-
-                CustomButton {
-                    id: loginButton
-                    text: qsTr("Sign in")
-                    enabled: root.userName.trim().length > 0 && root.password.length > 0
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 48
-                    onClicked: root.loginRequested(root.userName, root.password)
-
-                }
+        Label {
+            text: qsTr("Cramd - will it fit?")
+            color: "black"
+            font.pixelSize: 24
+            font.bold: true
+            Layout.fillWidth: true
+        }
 
 
-                SignUpButton {
-                    id: signUpButton
-                    text: qsTr("Create account")
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 48
-                    onClicked: registerUserSelected()
+        CustomTextField {
+            id: userNameField
+            objectName: "userNameField"
+            placeholderText: qsTr("Email or Username")
+            Layout.fillWidth: true
+            onAccepted: passwordField.forceActiveFocus()
+            onActiveFocusChanged: if (activeFocus) root.inputFocusRequested(userNameField)
+        }
 
-                }
+
+        CustomTextField {
+            id: passwordField
+            objectName: "passwordField"
+            placeholderText: qsTr("Password")
+            echoMode: TextInput.Password
+            Layout.fillWidth: true
+            onActiveFocusChanged: if (activeFocus) root.inputFocusRequested(passwordField)
+            onAccepted: {
+                if (loginButton.enabled)
+                    root.loginRequested(root.userName, root.password)
             }
         }
+
+        CustomButton {
+            id: loginButton
+            text: qsTr("Sign in")
+            enabled: root.userName.trim().length > 0 && root.password.length > 0
+            Layout.fillWidth: true
+            Layout.preferredHeight: 48
+            onClicked: root.loginRequested(root.userName, root.password)
+
+        }
+
+
+        Label {
+            text: root.errorMessage
+            color: "#ff8a80"
+            visible: formContent.errorMessage.length > 0
+            wrapMode: Text.Wrap
+            Layout.alignment: Qt.AlignHCenter
+            Layout.preferredHeight: 48
+            Layout.preferredWidth: 120
+        }
+
+        Label {
+            text: qsTr("Don't have an account? SIGN UP")
+            color: "#5b21b6"
+            MouseArea {
+                anchors.fill: parent
+                onPressed: registerUserSelected()
+            }
+        }
+
     }
 }

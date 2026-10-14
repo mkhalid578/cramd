@@ -7,8 +7,13 @@
 #include <QNetworkRequest>
 #include <QTimer>
 
+#ifndef CRAMD_API_BASE_URL
+#define CRAMD_API_BASE_URL "http://localhost:3000"
+#endif
+
 Client::Client(QObject *parent)
     : QObject(parent)
+    , m_baseUrl(QUrl(QStringLiteral(CRAMD_API_BASE_URL)))
 {
 }
 

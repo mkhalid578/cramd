@@ -8,6 +8,9 @@ find_package(Qt6 REQUIRED COMPONENTS Network Quick)
 
 qt_standard_project_setup(REQUIRES 6.10)
 
+set(CRAMD_API_BASE_URL "http://localhost:3000" CACHE STRING
+    "Base URL of the Cramd API (set this to a reachable server URL for iOS devices)")
+
 # Content of downloaded design from Figma to Qt or similar
 if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/importedcontent/CMakeLists.txt")
         add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/importedcontent)
@@ -72,7 +75,7 @@ qt_add_qml_module(cramd-components
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 set_target_properties(cramd-app PROPERTIES
-        #    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appcramd
+        MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appcramd
         MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
         MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
         MACOSX_BUNDLE TRUE
@@ -81,6 +84,10 @@ set_target_properties(cramd-app PROPERTIES
 
 target_link_libraries(cramd-app
         PRIVATE Qt6::Network Qt6::Quick cramd-componentsplugin
+)
+
+target_compile_definitions(cramd-app PRIVATE
+        "CRAMD_API_BASE_URL=\"${CRAMD_API_BASE_URL}\""
 )
 
 install(TARGETS cramd-app

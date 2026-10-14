@@ -15,7 +15,7 @@ T.Button {
     }
 
     background: Rectangle {
-        radius: 12
+        radius: 8
         gradient: Gradient {
             GradientStop {
                 position: 0

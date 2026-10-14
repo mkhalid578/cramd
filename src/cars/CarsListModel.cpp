@@ -1,7 +1,6 @@
 #include "CarsListModel.h"
 
 #include <QModelIndex>
-#include <QVariantMap>
 
 CarsListModel::CarsListModel(QObject *parent)
     : QAbstractListModel(parent)
@@ -21,34 +20,16 @@ QVariant CarsListModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0 || index.row() >= m_cars.size())
         return {};
 
-    if (role == CarRole)
-        return m_cars.at(index.row());
-
-    const QVariantMap car = m_cars.at(index.row()).toMap();
-    qDebug() << car;
-    const auto names = roleNames();
-    const auto roleName = names.constFind(role);
-    if (roleName == names.cend())
+    if (role != CarRole)
         return {};
 
-    return car.value(QString::fromUtf8(*roleName));
+    return m_cars.at(index.row());
 }
 
 QHash<int, QByteArray> CarsListModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles.insert(CarRole, "car");
-
-    int role = CarRole + 1;
-    for (const QVariant &item : m_cars) {
-        const QVariantMap car = item.toMap();
-        for (auto it = car.cbegin(); it != car.cend(); ++it) {
-            const QByteArray roleName = it.key().toUtf8();
-            if (!roles.values().contains(roleName))
-                roles.insert(role++, roleName);
-        }
-    }
-
     return roles;
 }
 
@@ -59,7 +40,9 @@ QVariantList CarsListModel::cars() const
 
 void CarsListModel::setCars(const QVariantList &cars)
 {
-    qDebug() << cars;
+    if (m_cars == cars)
+        return;
+
     beginResetModel();
     m_cars = cars;
     endResetModel();

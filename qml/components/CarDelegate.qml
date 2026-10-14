@@ -7,7 +7,6 @@ Rectangle {
     property bool favorite: false
     property int suitcaseCount: 0
     property int strollerCount: 0
-    readonly property real edgeFadeHeight: 36
     signal selected(var car)
     signal favoriteToggled(var car)
     signal suitcaseAdded(var car)
@@ -15,13 +14,6 @@ Rectangle {
 
     width: ListView.view.width - ListView.view.leftMargin - ListView.view.rightMargin
     height: 160
-    opacity: {
-        const list = ListView.view
-        const itemTop = y - list.contentY
-        return Math.min(1,
-                Math.max(0, (itemTop + height) / edgeFadeHeight),
-                Math.max(0, (list.height - itemTop) / edgeFadeHeight))
-    }
     radius: 8
     color: "white"
     border.color: "#dddddd"
@@ -43,6 +35,8 @@ Rectangle {
             Image {
                 source: CarMake.urlForMake(`${car.make}`)
                 fillMode: Image.PreserveAspectFit
+                asynchronous: true
+                sourceSize: Qt.size(96, 64)
             }
 
             Label {

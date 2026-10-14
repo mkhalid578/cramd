@@ -7,7 +7,9 @@ Item {
     id: root
 
     implicitWidth: 380
-    implicitHeight: formContent.implicitHeight + 56
+    implicitHeight: formContent.implicitHeight
+                     + (root.width < 360 ? 40 : 56)
+    height: implicitHeight
 
     property alias userName: userNameField.text
     property alias firstName: firstNameField.text
@@ -18,9 +20,13 @@ Item {
 
     signal registerRequested(string email, string first, string last, string password)
     signal backToLoginRequested()
+    signal inputFocusRequested(var input)
 
     Rectangle {
-        anchors.fill: parent
+        width: Math.min(root.width - 32, 380)
+        height: formContent.implicitHeight
+                + (root.width < 360 ? 40 : 56)
+        anchors.centerIn: parent
         radius: 12
         color: "#262626"
         border.color: "#3b3b3b"
@@ -28,8 +34,8 @@ Item {
         ColumnLayout {
             id: formContent
             anchors.fill: parent
-            anchors.margins: 28
-            spacing: 16
+            anchors.margins: root.width < 360 ? 20 : 28
+            spacing: root.width < 360 ? 12 : 16
 
             Button {
                 text: qsTr("←  Back to sign in")
@@ -70,8 +76,10 @@ Item {
                 id: userNameField
                 objectName: "userNameField"
                 placeholderText: qsTr("Email")
+                inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhNoPredictiveText
                 Layout.fillWidth: true
-                onAccepted: passwordField.forceActiveFocus()
+                onActiveFocusChanged: if (activeFocus) root.inputFocusRequested(userNameField)
+                onAccepted: firstNameField.forceActiveFocus()
             }
 
             Label {
@@ -83,8 +91,10 @@ Item {
             CustomTextField {
                 id: firstNameField
                 placeholderText: qsTr("First Name")
+                inputMethodHints: Qt.ImhNoAutoUppercase
                 Layout.fillWidth: true
-                onAccepted: passwordField.forceActiveFocus()
+                onActiveFocusChanged: if (activeFocus) root.inputFocusRequested(firstNameField)
+                onAccepted: lastNameField.forceActiveFocus()
             }
             Label {
                 text: qsTr("Last Name")
@@ -95,7 +105,9 @@ Item {
             CustomTextField {
                 id: lastNameField
                 placeholderText: qsTr("Last Name")
+                inputMethodHints: Qt.ImhNoAutoUppercase
                 Layout.fillWidth: true
+                onActiveFocusChanged: if (activeFocus) root.inputFocusRequested(lastNameField)
                 onAccepted: passwordField.forceActiveFocus()
             }
 
@@ -105,16 +117,18 @@ Item {
                 Layout.fillWidth: true
             }
 
-            CustomTextField {
+            TextField {
                 id: passwordField
                 objectName: "passwordField"
                 placeholderText: qsTr("Password")
                 echoMode: TextInput.Password
                 Layout.fillWidth: true
-                // onAccepted: {
-                //     if (loginButton.enabled)
-                //         root.loginRequested(root.userName, root.password)
-                // }
+                onActiveFocusChanged: if (activeFocus) root.inputFocusRequested(passwordField)
+                onAccepted: {
+                    if (loginButton.enabled)
+                        root.registerRequested(root.userName, root.firstName,
+                                               root.lastName, root.password)
+                }
             }
 
             Label {

@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Controls.Basic as T
+import QtQuick.Controls.iOS as T
 
 T.Button {
     id: control

@@ -152,6 +152,7 @@ Item {
                         anchors.fill: parent
                         model: root.service.carsModel
                         clip: true
+                        cacheBuffer: 320
                         spacing: 12
                         topMargin: 4
                         leftMargin: 8
