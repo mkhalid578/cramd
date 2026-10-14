@@ -12,6 +12,8 @@ ApplicationWindow {
 
     enum Pages {Login = 0, Register = 1, Main = 2 }
 
+    property int page: auth.authenticated ? Main.Pages.Main : Main.Pages.Login
+
     Client {
         id: api
         baseUrl: "http://localhost:3000"
@@ -29,15 +31,11 @@ ApplicationWindow {
 
     Connections {
         target: auth
-        function onSuccessMsgChanged() {
-            pages.currentIndex = Main.Pages.Login
-        }
-    }
-
-    StackLayout {
-        id: pages
-        anchors.fill: parent
-        currentIndex: auth.authenticated ? Main.Pages.Main : 0
+        function onAuthenticatedChanged() {
+            if (auth.authenticated)
+                pages.push(mainPage)
+            else
+                pages.pop()
 
         }
     }
@@ -48,7 +46,6 @@ ApplicationWindow {
             LoginForm {
                 anchors.centerIn: parent
                 errorMessage: auth.errorMessage
-                id: loginForm
                 successMsg: auth.successMsg
                 width: Math.min(parent.width - 32, 380)
 

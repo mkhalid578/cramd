@@ -44,16 +44,6 @@ Item {
             }
 
             Label {
-                text: qsTr("Sign up?")
-                color: "#bdbdbd"
-                Layout.fillWidth: true
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: registerUserSelected()
-                }
-            }
-
-            Label {
                 text: qsTr("User name")
                 color: "#f4f4f4"
                 Layout.fillWidth: true
