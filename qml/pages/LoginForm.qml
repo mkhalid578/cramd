@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
-import cramd
+import cramd.components 1.0
 
 Item {
     id: root

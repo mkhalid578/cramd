@@ -30,15 +30,7 @@ qt_add_qml_module(cramd-app
         qml/pages/LoginForm.qml
         qml/pages/LoginSuccessPage.qml
         qml/CarMake.qml
-        qml/components/InfoPopup.qml
-        qml/components/CarInfoPopup.qml
-        qml/components/CustomTabButton.qml
-        qml/components/RefreshButton.qml
-        qml/components/CargoItemCounter.qml
-        qml/components/CargoItemsComboBox.qml
         qml/pages/RegisterForm.qml
-        qml/components/SignInButton.qml
-        qml/components/SignUpButton.qml
         qml/pages/MainPage.qml
         qml/components/CarDelegate.qml
 
@@ -56,6 +48,22 @@ qt_add_qml_module(cramd-app
 
 )
 
+qt_add_library(cramd-components STATIC)
+
+qt_add_qml_module(cramd-components
+        URI cramd.components
+        VERSION 1.0
+        QML_FILES
+        qml/components/InfoPopup.qml
+        qml/components/CarInfoPopup.qml
+        qml/components/CustomTabButton.qml
+        qml/components/RefreshButton.qml
+        qml/components/CargoItemCounter.qml
+        qml/components/CargoItemsComboBox.qml
+        qml/components/SignInButton.qml
+        qml/components/SignUpButton.qml
+)
+
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
@@ -68,7 +76,7 @@ set_target_properties(cramd-app PROPERTIES
 )
 
 target_link_libraries(cramd-app
-        PRIVATE Qt6::Network Qt6::Quick
+        PRIVATE Qt6::Network Qt6::Quick cramd-componentsplugin
 )
 
 install(TARGETS cramd-app
