@@ -259,42 +259,14 @@ Item {
                     Layout.fillWidth: true
                 }
 
-                Button {
+                LogoutButton {
                     id: logoutButton
                     text: qsTr("Log Out")
-                    Layout.fillWidth: true
+                    Layout.preferredWidth: 48
+                    Layout.preferredHeight: 48
+                    Layout.margins: 8
                     onClicked: root.logoutRequested()
 
-                    contentItem: RowLayout {
-                        spacing: 10
-                        anchors.centerIn: parent
-
-                        Text {
-                            text: "⇥"
-                            color: "#fca5a5"
-                            font.pixelSize: 20
-                            Layout.alignment: Qt.AlignVCenter
-                        }
-
-                        Label {
-                            text: logoutButton.text
-                            color: "#fecaca"
-                            font.bold: true
-                            Layout.alignment: Qt.AlignVCenter
-                        }
-                    }
-
-                    background: Rectangle {
-                        radius: 12
-                        color: logoutButton.down ? "#7f1d1d"
-                                     : logoutButton.hovered ? "#3f1d25" : "#2b1c22"
-                        border.color: "#7f343d"
-                        border.width: 1
-
-                        Behavior on color {
-                            ColorAnimation { duration: 130 }
-                        }
-                    }
                 }
             }
         }

@@ -61,7 +61,12 @@ ApplicationWindow {
 
         Item {
             RegisterForm {
-                onRegisterUserSelected: pages.currentIndex = Main.Pages.Register
+                anchors.centerIn: parent
+                width: Math.min(parent.width - 32, 380)
+                errorMessage: auth.errorMessage
+                successMsg: auth.successMsg
+                onRegisterRequested: (user, first, last, password) => auth.registerUser(first, last, user, password)
+                onBackToLoginRequested: registerOverlay.pop()
             }
         }
     }
