@@ -37,7 +37,14 @@ void AuthService::setClient(Client *client)
         m_pendingRequestId = 0;
         setBusy(false);
 
-        if (statusCode >= 200 && statusCode < 300) {
+        switch (statusCode) {
+        case 201:
+            // we've created something so we should handle that here
+            // user object successfully created
+            setSuccessMessage("User created successfully");
+            break;
+        case 200:
+            // status is ok (typically login)
             m_token = body.toMap().value("token").toString();
             if (m_token.isEmpty()) {
                 setErrorMessage(tr("Sign in response did not include an access token."));
@@ -52,12 +59,15 @@ void AuthService::setClient(Client *client)
             m_firstName = body.toMap().value("first_name").toString();
             emit firstNameChanged();
             emit authenticatedChanged();
-            return;
+            break;
+        default:
+            break;
         }
 
+
         if (statusCode >= 300) {
-            setErrorMessage (tr("Sign in failed. Please try again."));
-            auth_count++;
+
+            setErrorMessage (body.toMap().value("error").toString());
         }
 
     });
@@ -79,6 +89,7 @@ bool AuthService::busy() const { return m_busy; }
 bool AuthService::authenticated() const { return m_authenticated; }
 QString AuthService::userName() const { return m_userName; }
 QString AuthService::errorMessage() const { return m_errorMessage; }
+
 
 void AuthService::login(const QString &userName, const QString &password)
 {
@@ -121,6 +132,30 @@ void AuthService::logout()
     emit userNameChanged();
 }
 
+void AuthService::registerUser(const QString &first, const QString &last, const QString &email, const QString &password)
+{
+
+    if (m_busy)
+        return;
+
+    setErrorMessage({});
+    setSuccessMessage({});
+    setBusy(true);
+
+    if (!m_client) {
+        m_pendingRequestId = 0;
+        setBusy(false);
+        setErrorMessage(tr("Authentication service is unavailable."));
+        return;
+    }
+
+    m_client->setBearerToken({});
+    m_pendingRequestId = m_client->post(
+        "auth/register",
+        {{"email", email}, {"password", password}, {"first_name", first}, {"last_name", last}});
+
+}
+
 void AuthService::setBusy(bool busy)
 {
     if (m_busy == busy)
@@ -138,7 +173,22 @@ void AuthService::setErrorMessage(const QString &message)
     m_errorMessage = message;
     emit errorMessageChanged();
 }
+
+void AuthService::setSuccessMessage(const QString &message)
+{
+    if (m_successMsg == message) {
+        return;
+    }
+
+    m_successMsg = message;
+    emit successMsgChanged();
+}
 QString AuthService::firstName() const
 {
     return m_firstName;
+}
+
+QString AuthService::successMsg() const
+{
+    return m_successMsg;
 }

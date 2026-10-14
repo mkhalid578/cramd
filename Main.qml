@@ -10,6 +10,10 @@ ApplicationWindow {
     visible: true
     title: auth.authenticated ? qsTr("Home") : qsTr("Sign in")
 
+    enum Pages {Login = 0, Register = 1, Main = 2 }
+
+    property int page: auth.authenticated ? Main.Pages.Main : Main.Pages.Login
+
     Client {
         id: api
         baseUrl: "http://localhost:3000"
@@ -25,35 +29,94 @@ ApplicationWindow {
         client: api
     }
 
-    StackLayout {
-        id: pages
-        anchors.fill: parent
-        currentIndex: auth.authenticated ? 1 : 0
+    Connections {
+        target: auth
+        function onAuthenticatedChanged() {
+            if (auth.authenticated)
+                pages.push(mainPage)
+            else
+                pages.pop()
 
+        }
+    }
+
+    Component {
+        id: loginForm
         Item {
             LoginForm {
-                id: loginForm
+                anchors.centerIn: parent
+                errorMessage: auth.errorMessage
+                successMsg: auth.successMsg
+                width: Math.min(parent.width - 32, 380)
+
+                onLoginRequested: (user, password) => auth.login(user, password)
+
+                onRegisterUserSelected: registerOverlay.push(registerForm)
+            }
+        }
+    }
+
+    Component {
+        id: registerForm
+
+        Item {
+            RegisterForm {
                 anchors.centerIn: parent
                 width: Math.min(parent.width - 32, 380)
                 errorMessage: auth.errorMessage
-                onLoginRequested: (user, password) => auth.login(user, password)
+                successMsg: auth.successMsg
+                onRegisterRequested: (user, first, last, password) => auth.registerUser(first, last, user, password)
+                onBackToLoginRequested: registerOverlay.pop()
             }
         }
+    }
+
+    Component {
+        id: mainPage
 
         MainPage {
 
             username: auth.userName
             firstName: auth.firstName
 
-            onLogoutRequested: auth.logout()
+            onLogoutRequested: () => {
+                                   auth.logout()
+                                   pages.pop()
+                               }
             service: cars
 
         }
+    }
 
-        LoginSuccessPage {
-            userName: auth.userName
-            onSignOutRequested: {
-                auth.logout()
+    StackView{
+        id: pages
+        anchors.fill: parent
+        initialItem: loginForm
+    }
+
+    StackView {
+        id: registerOverlay
+        anchors.fill: parent
+        z: 1
+        initialItem: Item {}
+
+        pushEnter: Transition {
+            NumberAnimation {
+                property: "y"
+                from: registerOverlay.height
+                to: 0
+                duration: 350
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        popExit: Transition {
+            NumberAnimation {
+                property: "y"
+                from: 0
+                to: registerOverlay.height + 10
+                duration: 280
+                easing.type: Easing.OutCubic
             }
         }
     }

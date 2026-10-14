@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
+import cramd.components 1.0
 
 Item {
     id: root
@@ -11,8 +12,10 @@ Item {
     property alias userName: userNameField.text
     property alias password: passwordField.text
     property string errorMessage: ""
+    property string successMsg: ""
 
     signal loginRequested(string userName, string password)
+    signal registerUserSelected();
 
     Rectangle {
         anchors.fill: parent
@@ -80,12 +83,29 @@ Item {
                 Layout.fillWidth: true
             }
 
-            Button {
-                id: loginButton
-                text: qsTr("Sign in")
-                enabled: root.userName.trim().length > 0 && root.password.length > 0
+            RowLayout {
                 Layout.fillWidth: true
-                onClicked: root.loginRequested(root.userName, root.password)
+                spacing: 12
+
+                SignInButton {
+                    id: loginButton
+                    text: qsTr("Sign in")
+                    enabled: root.userName.trim().length > 0 && root.password.length > 0
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    onClicked: root.loginRequested(root.userName, root.password)
+
+                }
+
+
+                SignUpButton {
+                    id: signUpButton
+                    text: qsTr("Create account")
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 48
+                    onClicked: registerUserSelected()
+
+                }
             }
         }
     }
